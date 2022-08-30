@@ -1,1 +1,1 @@
-Azure AD KQL queries
+# Azure AD KQL queries
