@@ -1,0 +1,1 @@
+# Azure Database KQL
