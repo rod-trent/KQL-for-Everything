@@ -1,0 +1,7 @@
+// Top 10 client IPs and http versions 
+
+AzureDiagnostics
+| where ResourceProvider == "MICROSOFT.NETWORK" and Category == "FrontdoorAccessLog"
+| summarize RequestCount = count() by ClientIP = client_ip_s, HttpVersion = httpVersion_s, Resource
+| top 10 by RequestCount 
+| order by RequestCount desc
