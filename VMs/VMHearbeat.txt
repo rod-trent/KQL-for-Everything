@@ -1,0 +1,11 @@
+//Expected heartbeats for agented VMs versus actual heartbeats
+
+
+let multiplier = todecimal(1);
+Heartbeat
+| where TimeGenerated > ago(1d)
+| summarize heartbeat_count = count(TimeGenerated) by _ResourceId, Computer, Category
+| extend expectedHeartbeats = 1440 * multiplier
+| extend Availability = round(todecimal(heartbeat_count) / expectedHeartbeats * 100, 2)
+| project Computer, Category, Availability, expectedHeartbeats, heartbeat_count
+| order by Computer desc
