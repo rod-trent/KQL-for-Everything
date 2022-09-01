@@ -1,0 +1,5 @@
+// Show login events reported over the last hour 
+
+ContainerRegistryLoginEvents
+| where TimeGenerated > ago(1h)
+| sort by TimeGenerated asc
