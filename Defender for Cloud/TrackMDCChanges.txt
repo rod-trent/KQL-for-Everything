@@ -1,0 +1,6 @@
+//Track when someone makes MDC portal environment settings
+
+AzureActivity
+| where OperationNameValue == "MICROSOFT.OPERATIONSMANAGEMENT/SOLUTIONS/WRITE"
+| where ActivityStatusValue == "Success"
+| project Caller, CallerIpAddress, ResourceGroup
