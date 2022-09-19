@@ -3,4 +3,5 @@
 AzureActivity
 | where OperationNameValue == "MICROSOFT.OPERATIONSMANAGEMENT/SOLUTIONS/WRITE"
 | where ActivityStatusValue == "Success"
-| project Caller, CallerIpAddress, ResourceGroup
+| mv-expand Prop = Properties_d.resource to typeof(string)
+| distinct Caller, CallerIpAddress, ResourceGroup, Prop
