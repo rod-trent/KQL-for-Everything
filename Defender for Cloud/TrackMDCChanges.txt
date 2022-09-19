@@ -1,4 +1,4 @@
-//Track when someone makes MDC portal environment settings
+//Track when someone makes MDC portal environment settings and what was upgraded/changed
 
 AzureActivity
 | where OperationNameValue == "MICROSOFT.OPERATIONSMANAGEMENT/SOLUTIONS/WRITE"
