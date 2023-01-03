@@ -1,4 +1,4 @@
-//Shows the count of vulnerabilites in the environment
+//Shows the count of vulnerabilities in the environment
 
 DeviceTvmSoftwareVulnerabilitiesKB
 | join (DeviceTvmSoftwareVulnerabilities) on CveId
