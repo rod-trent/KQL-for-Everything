@@ -1,0 +1,18 @@
+//correlate users to computer
+
+let MostLoggedOn =
+DeviceLogonEvents
+| where LogonType in ("Interactive","CachedInteractive","RemoteInteractive") and ActionType == "LogonSuccess" 
+| where isnotempty(AccountSid)
+| summarize timesloggedon=count() by DeviceName, AccountName, AccountSid
+| summarize arg_max(timesloggedon,*) by DeviceName
+| project OnPremSid = AccountSid, DeviceName, AccountName
+| join kind = fullouter (IdentityInfo) on OnPremSid
+| where isnotempty(OnPremSid)
+| distinct DeviceName, OnPremSid, AccountName, AccountDomain, JobTitle, Department, EmailAddress;
+DeviceInfo
+| where isnotempty(OSPlatform) //and OSDistribution contains "Windows10"
+| distinct DeviceName, OnboardingStatus, DeviceType, OSPlatform, OSVersionInfo
+| sort by DeviceName
+| join kind=inner (MostLoggedOn) on DeviceName
+| project-away DeviceName1
