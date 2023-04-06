@@ -1,4 +1,5 @@
 //Device Last Seen time
+//Built by my wonderful colleague, Andrea Fisher
 
 let info = DeviceInfo
 | project DeviceId, DeviceName, OnboardingStatus, OSPlatform, OSVersion;
