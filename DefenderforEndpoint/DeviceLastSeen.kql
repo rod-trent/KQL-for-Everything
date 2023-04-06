@@ -1,0 +1,11 @@
+//Device Last Seen time
+
+let info = DeviceInfo
+| project DeviceId, DeviceName, OnboardingStatus, OSPlatform, OSVersion;
+let seen = DeviceTvmSoftwareEvidenceBeta
+| project DeviceId, LastSeenTime;
+let finallist = info
+| join kind=inner (seen) on DeviceId
+| project DeviceId, LastSeenTime, DeviceName, OnboardingStatus, OSPlatform, OSVersion;
+finallist
+| project DeviceName, LastSeenTime, OnboardingStatus, OSPlatform, OSVersion
