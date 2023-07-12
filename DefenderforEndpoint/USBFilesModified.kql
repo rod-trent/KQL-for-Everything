@@ -1,0 +1,7 @@
+//USB file modified events
+
+DeviceFileEvents
+| where ActionType == "FileModified"
+| summarize USBWriteCount = count() by InitiatingProcessAccountName
+| where USBWriteCount > 1
+| order by USBWriteCount desc
