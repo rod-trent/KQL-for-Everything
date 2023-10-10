@@ -1,0 +1,7 @@
+//Return the name and the number of running AKS clusters in your subscription. Run in Azure Resource Graph Explorer.
+Resources
+| where type == "microsoft.containerservice/managedclusters"
+| extend nodepools = properties.agentPoolProfiles
+| mv-expand nodepools
+| where nodepools.powerState.code == "Running"
+| summarize count() by name
