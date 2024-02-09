@@ -1,4 +1,4 @@
-//When LAWS daily cap is reached
+//When Daily Cap is reached
 
 _LogOperation
 | where Category =~ "Ingestion" 
