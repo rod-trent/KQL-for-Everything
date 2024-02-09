@@ -1,0 +1,5 @@
+//When LAWS daily cap is reached
+
+_LogOperation
+| where Category =~ "Ingestion" 
+| where Detail contains "OverQuota"
