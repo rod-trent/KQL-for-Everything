@@ -1,4 +1,4 @@
-//Devices that are enrolled in Microsoft Intune. Add the device health score and the compliance status for each device using the lookup operator to join the devices table with a table of device health data and a table of device compliance data, based on the device ID
+//Devices that are enrolled in Microsoft Intune. Add the device health score and the compliance status for each device using the join operator to join the devices table with a table of device health data and a table of device compliance data, based on the device ID
 
 DeviceInfo
 | where OnboardingStatus == "Onboarded"
