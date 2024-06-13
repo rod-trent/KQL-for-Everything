@@ -1,0 +1,11 @@
+//Display all instances of a specific process that is run on a Desktop that could be irregular.  
+
+DeviceProcessEvents
+| where Timestamp > ago(1d)
+| where FileName == "msedge.exe"
+| extend DesktopName = tolower(todynamic(AdditionalFields).DesktopName)
+| where isnotempty(DesktopName)
+| where DesktopName != "winsta0\\default"  // Ignore instances on primary interactive desktop
+    and DesktopName !has "sbox"            // Filter out sandbox processes
+| project Timestamp, FileName, DesktopName, ProcessCommandLine
+| order by Timestamp desc  
