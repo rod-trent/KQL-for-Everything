@@ -1,0 +1,17 @@
+let targetIncidentId = "INCIDENT_ID_HERE";
+let window = 2h;
+
+let anchor =
+    SecurityIncident
+    | where IncidentId == targetIncidentId
+    | join kind=inner (AlertInfo | project AlertId, Timestamp, DeviceName) on IncidentId;
+
+DeviceNetworkEvents
+| join kind=inner (anchor | project DeviceName, Timestamp) on DeviceName
+| where Timestamp between (Timestamp - window .. Timestamp + window)
+| project Timestamp, DeviceName, RemoteIP, RemotePort, Protocol,
+          ReportId, InitiatingProcessFileName, InitiatingProcessCommandLine
+| summarize Connections = make_set(pack("Time", Timestamp, "IP", RemoteIP, "Port", RemotePort,
+                                        "Proc", InitiatingProcessFileName,
+                                        "Cmd", InitiatingProcessCommandLine), 1000)
+          by Device
