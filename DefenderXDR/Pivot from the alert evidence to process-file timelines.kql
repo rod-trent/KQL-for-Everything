@@ -1,0 +1,29 @@
+let targetIncidentId = "INCIDENT_ID_HERE";
+let window = 2h;      // expand ±2h around alert time; tune to your needs
+
+// 1) Collect process/file evidence with timestamps and devices
+let proc_file =
+    SecurityIncident
+    | where IncidentId == targetIncidentId
+    | join kind=inner (AlertInfo | project AlertId, Timestamp, DeviceName, Title) on IncidentId
+    | join kind=inner (AlertEvidence) on AlertId
+    | where EntityType in ("Process","File")
+    | project AlertId, Title, AlertTime = Timestamp, DeviceName,
+              EntityType, FileName, FolderPath, SHA1, SHA256,
+              ProcessCommandLine, ProcessId, InitiatingProcessFileName, InitiatingProcessCommandLine;
+
+// 2) Expand to surrounding process execution
+DeviceProcessEvents
+| join kind=inner (proc_file | project DeviceName, AlertTime) on DeviceName
+| where Timestamp between (AlertTime - window .. AlertTime + window)
+| project Timestamp, DeviceName, FileName, ProcessCommandLine,
+          InitiatingProcessFileName, InitiatingProcessCommandLine, SHA1, SHA256
+| order by Timestamp asc
+
+// (Optional) Pull concurrent file writes/reads during same window
+// and correlate by device/process
+// ---
+DeviceFileEvents
+| join kind=inner (proc_file | project DeviceName, AlertTime) on DeviceName
+| where Timestamp between (AlertTime - window .. AlertTime + window)
+| project Timestamp, DeviceName, ActionType, FileName, FolderPath, SHA1, SHA256
