@@ -1,0 +1,20 @@
+// INPUTS: set these from your workflow
+let targetIncidentId = "INCIDENT_ID_HERE";      // e.g., 123
+let lookback = 14d;
+
+// Bind incident -> alerts -> evidence
+SecurityIncident
+| where IncidentId == targetIncidentId and Timestamp > ago(lookback)
+| join kind=inner (AlertInfo | project AlertId, Title, Timestamp, ServiceSource) on $left.IncidentId == $right.IncidentId
+| join kind=inner (AlertEvidence) on AlertId
+// Focus on URL clicks and supporting entities
+| where EntityType in ("Url","Ip","User","Account","Mailbox")
+| project IncidentId, AlertId, Title, Timestamp,
+          EntityType,
+          Url, UrlDomain, RemoteIP, IPAddress, // URL/IP evidence (columns vary by source)
+          UserName, AccountName, MailboxOwnerUPN // identity/mailbox evidence (columns vary)
+| summarize
+    Domains = make_set(UrlDomain, 1000),
+    Urls    = make_set(Url, 1000),
+    IPs     = make_set(coalesce(RemoteIP, IPAddress), 1000),
+    Users   = make_set(coalesce(UserName, AccountName, MailboxOwnerUPN), 1000)
