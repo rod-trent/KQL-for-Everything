@@ -1,0 +1,14 @@
+let targetIncidentId = "INCIDENT_ID_HERE";
+SecurityIncident
+| where IncidentId == targetIncidentId
+| join kind=inner (AlertInfo | project IncidentId, AlertId, Timestamp, Title) on IncidentId
+| join kind=inner (AlertEvidence) on AlertId
+| project IncidentId, AlertId, Title, Timestamp,
+          EntityType, Url, UrlDomain, IPAddress, RemoteIP,
+          UserName, AccountName, MailboxOwnerUPN
+| summarize
+    Domains = make_set(UrlDomain, 1000),
+    Users   = make_set(coalesce(UserName, AccountName, MailboxOwnerUPN), 1000),
+    IPs     = make_set(coalesce(RemoteIP, IPAddress), 1000)
+    by IncidentId
+``
