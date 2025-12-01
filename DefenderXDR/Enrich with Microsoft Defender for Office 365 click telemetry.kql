@@ -1,0 +1,24 @@
+let targetIncidentId = "INCIDENT_ID_HERE";
+let lookback = 14d;
+
+// Collect URL+user from alert evidence first
+let evidence =
+    SecurityIncident
+    | where IncidentId == targetIncidentId and Timestamp > ago(lookback)
+    | join kind=inner (AlertInfo | project IncidentId, AlertId, Timestamp) on IncidentId
+    | join kind=inner (AlertEvidence | where EntityType == "Url") on AlertId
+    | project Url, UrlDomain;
+
+// Pull Safe Links click events and join by URL domain
+UrlClickEvents
+| where Timestamp > ago(lookback)
+| extend ClickDomain = tostring(parse_url(Url).Host)
+| where ClickDomain in ((evidence | project UrlDomain))
+| project Timestamp, RecipientEmail, SenderFromAddress,
+          Url, ClickDomain, ActionType, DetectionMethod, Policy
+| summarize
+    ClickedDomains = make_set(ClickDomain, 1000),
+    Clickers       = make_set(RecipientEmail, 1000),
+    Senders        = make_set(SenderFromAddress, 1000)
+    by bin(Timestamp, 1h)
+``
