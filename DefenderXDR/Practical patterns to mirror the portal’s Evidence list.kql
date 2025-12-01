@@ -1,0 +1,15 @@
+let targetIncidentId = "INCIDENT_ID_HERE";
+
+SecurityIncident
+| where IncidentId == targetIncidentId
+| join kind=inner (AlertInfo | project IncidentId, AlertId, Title) on IncidentId
+| join kind=inner (AlertEvidence) on AlertId
+| project IncidentId, AlertId, Title,
+          EntityType, EvidenceRole, // e.g., "Indicator", "Target", "Source"
+          Verdict,                  // e.g., "Malicious", "Suspicious", "Clean"
+          RemediationStatus,        // e.g., "Succeeded", "Failed", "PendingApproval"
+          Url, UrlDomain, IPAddress, RemoteIP,
+          FileName, SHA1, SHA256, ProcessCommandLine,
+          UserName, AccountName, MailboxOwnerUPN
+| order by Verdict desc
+``
